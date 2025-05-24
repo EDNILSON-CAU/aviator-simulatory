@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aviator Simulador</title>
+  <style>
+    :root {
+      --bg-dark: #111;
+      --text-light: #fff;
+      --bg-light: #f4f4f4;
+      --text-dark: #333;
+      --highlight: #222;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      text-align: center;
+      padding: 2rem;
+      transition: background 0.3s, color 0.3s;
+    }
+    #aviator {
+      font-size: 2rem;
+      margin: 1rem 0;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      margin: 10px;
+      cursor: pointer;
+    }
+    .log {
+      margin-top: 1rem;
+      height: 150px;
+      overflow-y: auto;
+      background: var(--highlight);
+      padding: 10px;
+    }
+    #doc {
+      background: var(--bg-light);
+      color: var(--text-dark);
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      text-align: left;
+    }
+    #doc h1, #doc h2 {
+      color: var(--text-dark);
+    }
+    #doc code {
+      background: #eee;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    #doc .section {
+      margin-bottom: 2rem;
+    }
+    .download {
+      background: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simulação Aviator</h1>
+  <p>Créditos: <span id="credits">1000</span></p>
+  <p id="aviator">x1.00</p>
+  <input type="number" id="betAmount" placeholder="Valor da aposta" min="1">
+  <br>
+  <button onclick="startGame()">Apostar</button>
+  <button onclick="cashOut()">Sacar</button>
+  <button onclick="toggleTheme()">Alternar Tema</button>
+  <div class="log" id="log"></div>
+
+  <div id="doc">
+    <h1>📄 Documentação Técnica – Aviator Simulador</h1>
+    <div class="section">
+      <h2>1. Nome do Projeto</h2>
+      <p><strong>Aviator Simulador – Jogo com Créditos Fictícios</strong></p>
+    </div>
+    <div class="section">
+      <h2>2. Descrição do Projeto</h2>
+      <p>Um jogo tipo <em>Aviator</em>, onde o jogador aposta créditos fictícios em uma curva de multiplicador que cresce com o tempo. O objetivo é sacar os créditos antes que o avião “crashe”. Pode ser usado para fins de entretenimento, aprendizado ou como base para adaptação em plataformas licenciadas de apostas.</p>
+    </div>
+    <div class="section">
+      <h2>3. Tecnologias Utilizadas</h2>
+      <ul>
+        <li><strong>Frontend:</strong> HTML5, CSS3, JavaScript puro</li>
+        <li><strong>Lógica de Jogo:</strong> Baseada em probabilidade com <code>Math.random()</code></li>
+        <li><strong>Visual:</strong> Interface limpa e responsiva para navegador</li>
+        <li><strong>Requisitos:</strong> Nenhum backend necessário</li>
+      </ul>
+    </div>
+    <div class="section">
+      <h2>4. Funcionalidades</h2>
+      <ul>
+        <li>Créditos fictícios com saldo inicial</li>
+        <li>Sistema de aposta e saque</li>
+        <li>Multiplicador dinâmico</li>
+        <li>Probabilidade de crash aleatório</li>
+        <li>Histórico de partidas</li>
+        <li>100% local (offline)</li>
+      </ul>
+    </div>
+    <div class="section">
+      <h2>5. Diferenciais</h2>
+      <ul>
+        <li>Código simples, leve e fácil de personalizar</li>
+        <li>Ideal para simulação e demonstração</li>
+        <li>Base sólida para adaptação com back-end, banco de dados e dinheiro real (com licença)</li>
+      </ul>
+    </div>
+    <div class="section">
+      <h2>6. Sugestão de Preço</h2>
+      <p>Para venda direta ou licença de uso: <strong>Entre 5.000 a 15.000 MZN</strong> dependendo da complexidade.</p>
+    </div>
+    <div class="section">
+      <h2>7. Pacote de Entrega</h2>
+      <ul>
+        <li>Código-fonte completo (HTML, JS, CSS)</li>
+        <li>Documentação técnica (este arquivo)</li>
+        <li>Ajuda com personalização (cores, logotipo, idioma)</li>
+      </ul>
+    </div>
+    <div class="section">
+      <h2>8. Direitos</h2>
+      <p>Você é o autor. Pode:</p>
+      <ul>
+        <li>Vender para empresas licenciadas</li>
+        <li>Adaptar e ampliar o sistema</li>
+        <li>Usar como portfólio de programador</li>
+      </ul>
+    </div>
+    <button class="download" onclick="baixarArquivo()">📥 Baixar Código HTML</button>
+  </div>
+
+  <script>
+    let multiplier = 1.00;
+    let interval;
+    let inGame = false;
+    let crashed = false;
+    let credits = 1000;
+    let bet = 0;
+
+    function updateCredits() {
+      document.getElementById('credits').textContent = credits;
+    }
+
+    function logMessage(msg) {
+      const log = document.getElementById('log');
+      log.innerHTML = msg + '<br>' + log.innerHTML;
+    }
+
+    function startGame() {
+      if (inGame) return;
+      bet = parseInt(document.getElementById('betAmount').value);
+      if (!bet || bet <= 0 || bet > credits) {
+        alert("Aposta inválida");
+        return;
+      }
+
+      credits -= bet;
+      updateCredits();
+
+      multiplier = 1.00;
+      crashed = false;
+      inGame = true;
+
+      interval = setInterval(() => {
+        multiplier += 0.01;
+        document.getElementById('aviator').textContent = 'x' + multiplier.toFixed(2);
+
+        if (Math.random() < (0.005 * multiplier)) {
+          crash();
+        }
+      }, 100);
+    }
+
+    function crash() {
+      clearInterval(interval);
+      inGame = false;
+      crashed = true;
+      logMessage(`🚨 Crashou em x${multiplier.toFixed(2)}! Você perdeu ${bet} créditos.`);
+    }
+
+    function cashOut() {
+      if (!inGame || crashed) return;
+      clearInterval(interval);
+      let ganho = bet * multiplier;
+      credits += Math.floor(ganho);
+      updateCredits();
+      logMessage(`✅ Sacou em x${multiplier.toFixed(2)}! Ganhou ${Math.floor(ganho)} créditos.`);
+      inGame = false;
+    }
+
+    function toggleTheme() {
+      const root = document.documentElement;
+      const dark = getComputedStyle(root).getPropertyValue('--bg-dark').trim() === '#111';
+      if (dark) {
+        root.style.setProperty('--bg-dark', '#fff');
+        root.style.setProperty('--text-light', '#000');
+        root.style.setProperty('--bg-light', '#222');
+        root.style.setProperty('--text-dark', '#eee');
+        root.style.setProperty('--highlight', '#444');
+      } else {
+        root.style.setProperty('--bg-dark', '#111');
+        root.style.setProperty('--text-light', '#fff');
+        root.style.setProperty('--bg-light', '#f4f4f4');
+        root.style.setProperty('--text-dark', '#333');
+        root.style.setProperty('--highlight', '#222');
+      }
+    }
+
+    function baixarArquivo() {
+      const html = document.documentElement.outerHTML;
+      const blob = new Blob([html], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'aviator_simulador.html';
+      a.click();
+    }
+  </script>
+</body>
+</html>
