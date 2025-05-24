@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
+<html lang="pt" style="--bg-dark: #111; --text-light: #fff; --bg-light: #f4f4f4; --text-dark: #333; --highlight: #222;"><head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aviator Simulador</title>
@@ -69,14 +67,14 @@
 </head>
 <body>
   <h1>Simulação Aviator</h1>
-  <p>Créditos: <span id="credits">1000</span></p>
-  <p id="aviator">x1.00</p>
+  <p>Créditos: <span id="credits">264</span></p>
+  <p id="aviator">x1.15</p>
   <input type="number" id="betAmount" placeholder="Valor da aposta" min="1">
   <br>
   <button onclick="startGame()">Apostar</button>
   <button onclick="cashOut()">Sacar</button>
   <button onclick="toggleTheme()">Alternar Tema</button>
-  <div class="log" id="log"></div>
+  <div class="log" id="log">🚨 Crashou em x1.15! Você perdeu 400 créditos.<br>✅ Sacou em x1.62! Ganhou 648 créditos.<br>🚨 Crashou em x1.15! Você perdeu 500 créditos.<br>🚨 Crashou em x2.89! Você perdeu 100 créditos.<br>🚨 Crashou em x1.09! Você perdeu 100 créditos.<br>✅ Sacou em x2.18! Ganhou 217 créditos.<br>🚨 Crashou em x2.27! Você perdeu 1 créditos.<br></div>
 
   <div id="doc">
     <h1>📄 Documentação Técnica – Aviator Simulador</h1>
@@ -226,5 +224,6 @@
       a.click();
     }
   </script>
-</body>
-</html>
+
+
+</body></html>
