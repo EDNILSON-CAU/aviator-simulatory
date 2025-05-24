@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aviator Simulador</title>
+  <style>
+    :root {
+      --bg-dark: #111;
+      --text-light: #fff;
+      --bg-light: #f4f4f4;
+      --text-dark: #333;
+      --highlight: #222;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      text-align: center;
+      padding: 2rem;
+    }
+    #aviator {
+      font-size: 2rem;
+      margin: 1rem 0;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      margin: 10px;
+      cursor: pointer;
+    }
+    .log {
+      margin-top: 1rem;
+      height: 150px;
+      overflow-y: auto;
+      background: var(--highlight);
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simulação Aviator</h1>
+  <p>Créditos: <span id="credits">1000</span></p>
+  <p id="aviator">x1.00</p>
+  <input type="number" id="betAmount" placeholder="Valor da aposta" min="1">
+  <br>
+  <button onclick="startGame()">Apostar</button>
+  <button onclick="cashOut()">Sacar</button>
+  <button onclick="toggleTheme()">Alternar Tema</button>
+  <div class="log" id="log"></div>
+
+  <script>
+    let multiplier = 1.00;
+    let interval;
+    let inGame = false;
+    let crashed = false;
+    let credits = 1000;
+    let bet = 0;
+
+    function updateCredits() {
+      document.getElementById('credits').textContent = credits;
+    }
+
+    function logMessage(msg) {
+      const log = document.getElementById('log');
+      log.innerHTML = msg + '<br>' + log.innerHTML;
+    }
+
+    function startGame() {
+      if (inGame) return;
+      bet = parseInt(document.getElementById('betAmount').value);
+      if (!bet || bet <= 0 || bet > credits) {
+        alert("Aposta inválida");
+        return;
+      }
+
+      credits -= bet;
+      updateCredits();
+
+      multiplier = 1.00;
+      crashed = false;
+      inGame = true;
+
+      interval = setInterval(() => {
+        multiplier += 0.01;
+        document.getElementById('aviator').textContent = 'x' + multiplier.toFixed(2);
+
+        if (Math.random() < (0.005 * multiplier)) {
+          crash();
+        }
+      }, 100);
+    }
+
+    function crash() {
+      clearInterval(interval);
+      inGame = false;
+      crashed = true;
+      logMessage(`🚨 Crashou em x${multiplier.toFixed(2)}! Você perdeu ${bet} créditos.`);
+    }
+
+    function cashOut() {
+      if (!inGame || crashed) return;
+      clearInterval(interval);
+      let ganho = bet * multiplier;
+      credits += Math.floor(ganho);
+      updateCredits();
+      logMessage(`✅ Sacou em x${multiplier.toFixed(2)}! Ganhou ${Math.floor(ganho)} créditos.`);
+      inGame = false;
+    }
+
+    function toggleTheme() {
+      const root = document.documentElement;
+      const dark = getComputedStyle(root).getPropertyValue('--bg-dark').trim() === '#111';
+      if (dark) {
+        root.style.setProperty('--bg-dark', '#fff');
+        root.style.setProperty('--text-light', '#000');
+        root.style.setProperty('--bg-light', '#222');
+        root.style.setProperty('--text-dark', '#eee');
+        root.style.setProperty('--highlight', '#444');
+      } else {
+        root.style.setProperty('--bg-dark', '#111');
+        root.style.setProperty('--text-light', '#fff');
+        root.style.setProperty('--bg-light', '#f4f4f4');
+        root.style.setProperty('--text-dark', '#333');
+        root.style.setProperty('--highlight', '#222');
+      }
+    }
+  </script>
+</body>
+</html>
